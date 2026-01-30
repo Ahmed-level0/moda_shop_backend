@@ -1,12 +1,12 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from .models import Cart, CartItem
 from products.models import Product
-from .serializers import CartSerializer, CartItemSerializer
+from .serializers import CartSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
-from django.db import transaction
+from orders.models import Order, OrderItem
 
 class CartViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
@@ -65,24 +65,80 @@ class CartViewSet(viewsets.ViewSet):
             item.save()
         return Response(CartSerializer(cart).data, status=200)
 
+ 
     @action(detail=False, methods=['post'])
     def checkout(self, request):
         cart = self.get_active_cart(request.user)
+
         if cart.items.count() == 0:
-            return Response({"error": "Cannot checkout empty cart"}, status=400)
+            return Response({"error": "Cart is empty"}, status=400)
+
+        phone = request.data.get('phone')
+        address = request.data.get('address')
+
+        if not phone or not address:
+            return Response({"error": "Phone and address required"}, status=400)
+
+        order = Order.objects.create(
+            user=request.user,
+            total_price=cart.total_price,
+            phone=phone,
+            address=address,
+            status='pending'
+        )
+
+        for item in cart.items.all():
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                quantity=item.quantity,
+                price=item.product.price
+            )
+        cart.is_active = False
+        cart.save()
+        
+        # Create a new active cart for the user
+        Cart.objects.create(user=request.user)
+        return Response({
+            "order_id": order.id,
+            "message": "Order created. Payment required."
+        }, status=201)
+    
+
+"""
+# Confirm Payment API View (Simulation)
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.db import transaction
+from .models import Order
+from cart.models import Cart
+
+class ConfirmPaymentAPIView(APIView):
+    def post(self, request):
+        order_id = request.data.get('order_id')
+        payment_reference = request.data.get('payment_reference')
+
+        order = Order.objects.get(id=order_id)
+
+        if order.payment_status == 'paid':
+            return Response({"detail": "Order already paid"})
 
         with transaction.atomic():
-            # Reduce stock
-            for item in cart.items.all():
+            for item in order.items.all():
                 if item.quantity > item.product.stock:
-                    return Response(
-                        {"error": f"Not enough stock for {item.product.name}"},
-                        status=400
-                    )
+                    order.payment_status = 'failed'
+                    order.save()
+                    return Response({"error": "Not enough stock"}, status=400)
+
                 item.product.stock -= item.quantity
                 item.product.save()
 
-            cart.is_active = False
-            cart.save()
+            order.payment_status = 'paid'
+            order.payment_reference = payment_reference
+            order.save()
 
-        return Response({"success": "Cart checked out successfully"}, status=200)
+            Cart.objects.filter(user=order.user, is_active=True).update(is_active=False)
+
+        return Response({"success": "Payment confirmed"})
+    """

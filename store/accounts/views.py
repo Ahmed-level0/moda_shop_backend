@@ -18,4 +18,4 @@ class LoginView(APIView):
         if user:
             token, created = Token.objects.get_or_create(user=user)
             return Response({'token': token.key})
-        return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'Please Check again'}, status=status.HTTP_400_BAD_REQUEST)

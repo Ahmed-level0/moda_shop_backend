@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,4 +26,5 @@ urlpatterns = [
     path("api/auth/registration/", include("dj_rest_auth.registration.urls")),
     path('api/auth/', include('accounts.urls')),
     path("accounts/", include("allauth.urls")), 
+    path("test-auth/", TemplateView.as_view(template_name="auth_test.html")),
 ]
