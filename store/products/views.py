@@ -12,7 +12,8 @@ class ProductListAPIView(ListAPIView):
 
     def get_queryset(self):
         queryset = Product.objects.all()
-
+        
+        # Apply filters based on query parameters
         if self.request.GET.get('discounted') == 'true':
             queryset = queryset.filter(discount__gt=0)
 
