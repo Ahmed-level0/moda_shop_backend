@@ -57,7 +57,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'orders',
+    'orders.apps.OrdersConfig',
     'accounts',
     'corsheaders',
     'payments',
@@ -123,6 +123,10 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+CSRF_TRUSTED_ORIGINS = [ # for ngrok testing (Development only)
+    "https://soaplike-uncalcined-delicia.ngrok-free.dev",
+]
 
 CORS_ALLOW_HEADERS = [
     "authorization",

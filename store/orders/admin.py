@@ -8,5 +8,6 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'status', 'total_price', 'created_at')
+    list_display = ('id','payment_reference' ,'user', 'status', 'total_price', 'created_at')
+    search_fields = ('user__username', 'payment_reference')
     inlines = [OrderItemInline]

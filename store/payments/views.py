@@ -95,7 +95,6 @@ class PayOrderView(APIView):
 def paymob_webhook(request):
     payload = request.body
     received_hmac = request.GET.get("hmac")
-    print("🔥 WEBHOOK HIT 🔥")
     calculated_hmac = hmac.new(
         settings.PAYMOB_HMAC_SECRET.encode(),
         payload,
@@ -114,7 +113,6 @@ def paymob_webhook(request):
             order = Order.objects.get(payment_reference=paymob_order_id)
             order.status = "paid"
             order.save()
-            print("Order marked as paid:", order.id)
         except Order.DoesNotExist:
             return Response({"error": "Order not found"}, status=404)
 
