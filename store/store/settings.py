@@ -23,9 +23,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-44wnch3=n+u*4+cajni*btg%#p5fk_n_c=$g730#-2gm52d1=j'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
+
+from dotenv import load_dotenv
+
+import os
+
+load_dotenv()
+
+PAYMOB_API_KEY = os.getenv("PAYMOB_API_KEY")
+PAYMOB_INTEGRATION_ID = os.getenv("PAYMOB_INTEGRATION_ID")
+PAYMOB_IFRAME_ID = os.getenv("PAYMOB_IFRAME_ID")
 
 
 # Application definition
@@ -50,6 +60,7 @@ INSTALLED_APPS = [
     'orders',
     'accounts',
     'corsheaders',
+    'payments',
 ]
 SITE_ID = 1
 
@@ -65,13 +76,21 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 LOGIN_ON_EMAIL_CONFIRMATION = True
 
-# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" # Development
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "your@gmail.com"
-EMAIL_HOST_PASSWORD = "APP_PASSWORD"
-EMAIL_PORT = 587
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend" # Production 
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" # Development
+
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend" # Production 
+
+CORS_ALLOWED_ORIGINS = [
+    # "https://your-frontend-domain.com",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    # "https://your-frontend-domain.com",
+]
+
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
+# SECURE_SSL_REDIRECT = True
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
