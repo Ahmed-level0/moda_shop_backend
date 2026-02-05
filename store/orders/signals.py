@@ -21,7 +21,6 @@ def order_status_changed(sender, instance, **kwargs):
     old_status = old_order.status
     new_status = instance.status
 
-    # If status did not change → do nothing
     if old_status == new_status:
         return
 
@@ -79,6 +78,13 @@ def order_status_changed(sender, instance, **kwargs):
     Thank you for shopping with us.
     Moda House.
     """
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [user_email],
+            fail_silently=False,
+        )
     
     if new_status == 'shipped':  
         subject = f"Order #{instance.id} Update"
@@ -118,5 +124,43 @@ def order_status_changed(sender, instance, **kwargs):
             message,
             settings.DEFAULT_FROM_EMAIL,
             [user_email],
+            fail_silently=False,
+        )
+
+
+
+@receiver(pre_save, sender=Order)
+def email_admin_order_status(sender, instance, **kwargs):
+
+    if not instance.pk:
+        return
+
+    try:
+        old_order = Order.objects.get(pk=instance.pk)
+    except Order.DoesNotExist:
+        return
+
+    old_status = old_order.status
+    new_status = instance.status
+
+    if old_status != new_status:
+
+        subject = f"Order #{instance.id} Status Updated"
+
+        message = f"""
+Order ID: {instance.id}
+Customer: {instance.user.username}
+Old Status: {old_status}
+New Status: {new_status}
+Total: {instance.total_price} EGP
+        """
+
+        admin_email = settings.DEFAULT_FROM_EMAIL
+
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [admin_email],
             fail_silently=False,
         )
