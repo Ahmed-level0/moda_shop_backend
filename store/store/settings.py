@@ -129,7 +129,7 @@ MIDDLEWARE = [
 CORS_ALLOW_ALL_ORIGINS = True
 
 CSRF_TRUSTED_ORIGINS = [ # for ngrok testing (Development only)
-    "https://soaplike-uncalcined-delicia.ngrok-free.dev",
+    "https://modashopbackend-production.up.railway.app",
 ]
 
 CORS_ALLOW_HEADERS = [
