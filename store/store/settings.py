@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,6 +23,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+load_dotenv()
+
 SECRET_KEY = os.getenv("SECRET_KEY_BASE64")
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -29,9 +32,8 @@ DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
+ENVIRONMENT = 'development' if DEBUG else 'production'
 
-
-load_dotenv()
 
 PAYMOB_API_KEY = os.getenv("PAYMOB_API_KEY")
 PAYMOB_INTEGRATION_ID = os.getenv("PAYMOB_INTEGRATION_ID")
@@ -161,16 +163,25 @@ WSGI_APPLICATION = 'store.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'store_db',
-        'USER': 'store_user',
-        'PASSWORD': 'ahmed@2005',
-        'HOST': 'localhost',
-        'PORT': '5432',
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if DATABASE_URL:
+    # Railway / Production
+    DATABASES = {
+        "default": dj_database_url.parse(DATABASE_URL)
     }
-}
+else:
+    # Local development
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": "store_db",
+            "USER": "store_user",
+            "PASSWORD": "ahmed@2005",
+            "HOST": "localhost",
+            "PORT": "5432",
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
