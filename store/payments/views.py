@@ -77,7 +77,8 @@ class PayOrderView(APIView):
                     "state": "Cairo"
                 },
                 "currency": "EGP",
-                "integration_id": settings.PAYMOB_INTEGRATION_ID
+                "integration_id": settings.PAYMOB_INTEGRATION_ID,
+                "redirection_url": "http://localhost:8000/api/payments/callback/", # Update as needed
             }
         ).json()
 
@@ -88,26 +89,26 @@ class PayOrderView(APIView):
         return Response({
             "payment_url": iframe_url
         })
-
-
+    
 @csrf_exempt
 @api_view(["POST"])
 def paymob_webhook(request):
     payload = request.body
     received_hmac = request.GET.get("hmac")
+    print(payload)
     calculated_hmac = hmac.new(
         settings.PAYMOB_HMAC_SECRET.encode(),
         payload,
         hashlib.sha512
     ).hexdigest()
-
+    print("Received HMAC:", received_hmac)
     if received_hmac != calculated_hmac:
         return Response({"error": "Invalid HMAC"}, status=403)
 
     data = json.loads(payload)
 
-    if data.get("obj", {}).get("success") is True:
-        paymob_order_id = data["obj"]["order"]["id"]
+    if data.get("success") is True:
+        paymob_order_id = data["order"]["id"]
 
         try:
             order = Order.objects.get(payment_reference=paymob_order_id)
@@ -117,3 +118,41 @@ def paymob_webhook(request):
             return Response({"error": "Order not found"}, status=404)
 
     return Response({"status": "ok"})
+
+
+def check_paymob_payment(paymob_order_id):
+    auth = requests.post(
+        "https://accept.paymob.com/api/auth/tokens",
+        json={"api_key": settings.PAYMOB_API_KEY}
+    ).json()
+    token = auth.get("token")
+    response = requests.get(
+        f"https://accept.paymob.com/api/ecommerce/orders/{paymob_order_id}",
+        headers={
+            "Authorization": f"Bearer {token}"
+        }
+    ).json()
+
+    if response.get("payment_status") == "PAID":
+        return True
+    return False
+
+@api_view(["GET"])
+def paymob_callback(request):
+
+    data = request.GET.dict()
+
+    paymob_order_id = data.get("order")
+
+    if not paymob_order_id:
+        return Response("Invalid callback", status=400)
+
+    result = check_paymob_payment(paymob_order_id)
+
+    if result is True:
+        order = Order.objects.get(payment_reference=paymob_order_id)
+        order.status = "paid"
+        order.save()
+        return Response("Payment Successful ✅")
+
+    return Response("Payment Failed ❌")
