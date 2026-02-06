@@ -79,9 +79,9 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 LOGIN_ON_EMAIL_CONFIRMATION = True
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" # Development
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" # Development
 
-# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend" # Production 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend" # Production 
 
 CORS_ALLOWED_ORIGINS = [
     # "https://your-frontend-domain.com",
@@ -168,7 +168,14 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 if DATABASE_URL:
     # Railway / Production
     DATABASES = {
-        "default": dj_database_url.parse(DATABASE_URL)
+            "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_NAME"),
+            "USER": os.getenv("DB_USER"),
+            "PASSWORD": os.getenv("DB_PASSWORD"),
+            "HOST": os.getenv("DB_HOST"),
+            "PORT": os.getenv("DB_PORT"),
+        }
     }
 else:
     # Local development
