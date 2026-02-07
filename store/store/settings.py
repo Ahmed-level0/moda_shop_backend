@@ -28,7 +28,7 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY_BASE64")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -81,12 +81,16 @@ LOGIN_ON_EMAIL_CONFIRMATION = True
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" # Development
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
 DEFAULT_FROM_EMAIL= os.getenv("ADMIN_EMAIL")
 EMAIL_HOST_USER = DEFAULT_FROM_EMAIL
 EMAIL_HOST_PASSWORD = os.getenv("APP_PASSWORD")
+
+EMAIL_FAIL_SILENTLY = False
 
 CORS_ALLOWED_ORIGINS = [
     # "https://your-frontend-domain.com",
