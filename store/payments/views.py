@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-
+from django.shortcuts import redirect
 from orders.models import Order
 
 class PayOrderView(APIView):
@@ -86,9 +86,11 @@ class PayOrderView(APIView):
 
         iframe_url = f"https://accept.paymob.com/api/acceptance/iframes/{settings.PAYMOB_IFRAME_ID}?payment_token={payment_token}"
 
-        return Response({
-            "payment_url": iframe_url
-        })
+        # return Response({
+        #     "payment_url": iframe_url
+        # })
+        
+        return redirect(iframe_url)
     
 @csrf_exempt
 @api_view(["POST"])

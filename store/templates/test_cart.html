@@ -595,6 +595,25 @@
       margin-top: 1rem;
     }
 
+    .pay-order-btn {
+      padding: 0.75rem 1.5rem;
+      background: var(--success);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .pay-order-btn:hover {
+      background: #00d2a0;
+      transform: translateY(-2px);
+    }
+
     @keyframes fadeIn {
       from {
         opacity: 0;
@@ -646,7 +665,7 @@
       }
     }
 
-    /* Login Modal Styles */
+    /* Login Modal & Profile Styles - continuing from previous... */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -677,20 +696,6 @@
       position: relative;
       max-height: 90vh;
       overflow-y: auto;
-    }
-
-    .auth-modal::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .auth-modal::-webkit-scrollbar-track {
-      background: var(--surface);
-      border-radius: 3px;
-    }
-
-    .auth-modal::-webkit-scrollbar-thumb {
-      background: var(--primary);
-      border-radius: 3px;
     }
 
     @keyframes slideUp {
@@ -730,10 +735,6 @@
       background: var(--card);
       color: var(--primary);
       box-shadow: 0 2px 8px var(--shadow);
-    }
-
-    .tab-btn:hover:not(.active) {
-      color: var(--text);
     }
 
     .tab-content {
@@ -828,10 +829,6 @@
     .login-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 32px rgba(26, 95, 122, 0.4);
-    }
-
-    .login-btn:active {
-      transform: translateY(0);
     }
 
     .login-btn:disabled {
@@ -965,7 +962,6 @@
       transform: scale(1.05);
     }
 
-    /* Profile Section */
     .profile-section {
       display: none;
       animation: fadeIn 0.8s ease-out;
@@ -1084,20 +1080,6 @@
       max-height: 600px;
       overflow-y: auto;
       padding-right: 0.5rem;
-    }
-
-    .orders-list::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .orders-list::-webkit-scrollbar-track {
-      background: var(--surface);
-      border-radius: 3px;
-    }
-
-    .orders-list::-webkit-scrollbar-thumb {
-      background: var(--accent);
-      border-radius: 3px;
     }
 
     .order-card {
@@ -1313,190 +1295,92 @@
       </div>
     </div>
 
-    <!-- Auth Modal -->
+    <!-- Auth Modal (Login/Register/Reset Password) -->
     <div class="modal-overlay" id="authModal">
       <div class="auth-modal">
-        <!-- Tabs -->
         <div class="modal-tabs">
-          <button class="tab-btn active" onclick="switchTab('login')">
-            🔐 Login
-          </button>
-          <button class="tab-btn" onclick="switchTab('register')">
-            ✨ Register
-          </button>
-          <button class="tab-btn" onclick="switchTab('reset')">
-            🔑 Reset Password
-          </button>
+          <button class="tab-btn active" onclick="switchTab('login')">🔐 Login</button>
+          <button class="tab-btn" onclick="switchTab('register')">✨ Register</button>
+          <button class="tab-btn" onclick="switchTab('reset')">🔑 Reset Password</button>
         </div>
 
-        <!-- Login Tab -->
         <div class="tab-content active" id="loginTab">
           <div class="login-header">
             <div class="login-icon">🔐</div>
             <div class="login-title">Welcome Back!</div>
             <div class="login-subtitle">Login to access your cart</div>
           </div>
-
           <form class="login-form" onsubmit="handleLogin(event)">
             <div class="form-group">
               <label class="form-label">Email</label>
-              <input 
-                type="email" 
-                id="loginEmail" 
-                class="form-input"
-                placeholder="your@email.com"
-                required
-              />
+              <input type="email" id="loginEmail" class="form-input" placeholder="your@email.com" required />
             </div>
-
             <div class="form-group">
               <label class="form-label">Username</label>
-              <input 
-                type="text" 
-                id="loginUsername" 
-                class="form-input"
-                placeholder="username"
-                required
-              />
+              <input type="text" id="loginUsername" class="form-input" placeholder="username" required />
             </div>
-
             <div class="form-group">
               <label class="form-label">Password</label>
-              <input 
-                type="password" 
-                id="loginPassword" 
-                class="form-input"
-                placeholder="••••••••"
-                required
-              />
+              <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required />
             </div>
-
             <div id="loginError" style="display: none;"></div>
-
-            <button type="submit" class="login-btn" id="loginSubmitBtn">
-              🚀 Login
-            </button>
+            <button type="submit" class="login-btn" id="loginSubmitBtn">🚀 Login</button>
           </form>
         </div>
 
-        <!-- Register Tab -->
         <div class="tab-content" id="registerTab">
           <div class="login-header">
             <div class="login-icon">✨</div>
             <div class="login-title">Create Account</div>
             <div class="login-subtitle">Join us and start shopping</div>
           </div>
-
           <form class="login-form" onsubmit="handleRegister(event)">
             <div class="form-group">
               <label class="form-label">Email</label>
-              <input 
-                type="email" 
-                id="registerEmail" 
-                class="form-input"
-                placeholder="your@email.com"
-                required
-              />
+              <input type="email" id="registerEmail" class="form-input" placeholder="your@email.com" required />
             </div>
-
             <div class="form-group">
               <label class="form-label">Username</label>
-              <input 
-                type="text" 
-                id="registerUsername" 
-                class="form-input"
-                placeholder="Choose a username"
-                required
-              />
+              <input type="text" id="registerUsername" class="form-input" placeholder="Choose a username" required />
             </div>
-
             <div class="form-group">
               <label class="form-label">Password</label>
-              <input 
-                type="password" 
-                id="registerPassword" 
-                class="form-input"
-                placeholder="••••••••"
-                required
-                minlength="8"
-              />
+              <input type="password" id="registerPassword" class="form-input" placeholder="••••••••" required minlength="8" />
               <div class="form-note">Minimum 8 characters</div>
             </div>
-
             <div class="form-group">
               <label class="form-label">Confirm Password</label>
-              <input 
-                type="password" 
-                id="registerPasswordConfirm" 
-                class="form-input"
-                placeholder="••••••••"
-                required
-              />
+              <input type="password" id="registerPasswordConfirm" class="form-input" placeholder="••••••••" required />
             </div>
-
             <div id="registerError" style="display: none;"></div>
-
-            <button type="submit" class="login-btn register-btn" id="registerSubmitBtn">
-              ✨ Create Account
-            </button>
+            <button type="submit" class="login-btn register-btn" id="registerSubmitBtn">✨ Create Account</button>
           </form>
         </div>
 
-        <!-- Reset Password Tab -->
         <div class="tab-content" id="resetTab">
           <div class="login-header">
             <div class="login-icon">🔑</div>
             <div class="login-title">Reset Password</div>
             <div class="login-subtitle">Change your password</div>
           </div>
-
           <form class="login-form" onsubmit="handlePasswordReset(event)">
             <div class="form-group">
               <label class="form-label">Current Password</label>
-              <input 
-                type="password" 
-                id="resetOldPassword" 
-                class="form-input"
-                placeholder="••••••••"
-                required
-              />
+              <input type="password" id="resetOldPassword" class="form-input" placeholder="••••••••" required />
             </div>
-
             <div class="form-group">
               <label class="form-label">New Password</label>
-              <input 
-                type="password" 
-                id="resetNewPassword" 
-                class="form-input"
-                placeholder="••••••••"
-                required
-                minlength="8"
-              />
+              <input type="password" id="resetNewPassword" class="form-input" placeholder="••••••••" required minlength="8" />
               <div class="form-note">Minimum 8 characters</div>
             </div>
-
             <div class="form-group">
               <label class="form-label">Confirm New Password</label>
-              <input 
-                type="password" 
-                id="resetNewPasswordConfirm" 
-                class="form-input"
-                placeholder="••••••••"
-                required
-              />
+              <input type="password" id="resetNewPasswordConfirm" class="form-input" placeholder="••••••••" required />
             </div>
-
             <div id="resetError" style="display: none;"></div>
-
-            <button type="submit" class="login-btn reset-btn" id="resetSubmitBtn">
-              🔑 Reset Password
-            </button>
-
+            <button type="submit" class="login-btn reset-btn" id="resetSubmitBtn">🔑 Reset Password</button>
             <div class="divider">OR</div>
-
-            <button type="button" class="login-btn" onclick="switchTab('login')" style="background: var(--text-light);">
-              Back to Login
-            </button>
+            <button type="button" class="login-btn" onclick="switchTab('login')" style="background: var(--text-light);">Back to Login</button>
           </form>
         </div>
       </div>
@@ -1504,81 +1388,48 @@
 
     <div class="token-section" style="display: none;">
       <label>🔑 Authorization Token</label>
-      <input 
-        type="text" 
-        id="token" 
-        class="token-input"
-        placeholder="Paste your API token here..." 
-        readonly
-      />
+      <input type="text" id="token" class="token-input" placeholder="Paste your API token here..." readonly />
     </div>
 
     <!-- Shop Section -->
     <div class="shop-section" id="shopSection">
-    <div class="main-grid">
-      <!-- Products Section -->
-      <div class="section">
-        <div class="section-title">
-          🏪 Available Products
-        </div>
-        
-        <div class="products-grid" id="productsGrid">
-          <!-- Sample Products -->
-        </div>
-
-        <button class="action-btn load-cart-btn" onclick="loadCart()">
-          📦 Load Current Cart
-        </button>
-      </div>
-
-      <!-- Cart Section -->
-      <div class="cart-section">
+      <div class="main-grid">
         <div class="section">
-          <div class="cart-header">
-            <div class="section-title" style="margin: 0;">
-              🛒 Your Cart
-            </div>
-            <div class="cart-count" id="cartCount">0</div>
-          </div>
+          <div class="section-title">🏪 Available Products</div>
+          <div class="products-grid" id="productsGrid"></div>
+          <button class="action-btn load-cart-btn" onclick="loadCart()">📦 Load Current Cart</button>
+        </div>
 
-          <div class="cart-items" id="cartItems">
-            <div class="empty-cart">
-              <div class="empty-cart-icon">🛍️</div>
-              <div>Your cart is empty</div>
+        <div class="cart-section">
+          <div class="section">
+            <div class="cart-header">
+              <div class="section-title" style="margin: 0;">🛒 Your Cart</div>
+              <div class="cart-count" id="cartCount">0</div>
             </div>
-          </div>
-
-          <div class="cart-summary" id="cartSummary" style="display: none;">
-            <div class="summary-row">
-              <span>Items:</span>
-              <span id="itemCount">0</span>
+            <div class="cart-items" id="cartItems">
+              <div class="empty-cart">
+                <div class="empty-cart-icon">🛍️</div>
+                <div>Your cart is empty</div>
+              </div>
             </div>
-            <div class="summary-row total">
-              <span>Total:</span>
-              <span id="cartTotal">$0.00</span>
+            <div class="cart-summary" id="cartSummary" style="display: none;">
+              <div class="summary-row">
+                <span>Items:</span>
+                <span id="itemCount">0</span>
+              </div>
+              <div class="summary-row total">
+                <span>Total:</span>
+                <span id="cartTotal">$0.00</span>
+              </div>
             </div>
-          </div>
-
-          <div class="checkout-section">
-            <input 
-              type="tel" 
-              id="phone" 
-              class="checkout-input"
-              placeholder="📱 Phone Number" 
-            />
-            <input 
-              type="text" 
-              id="address" 
-              class="checkout-input"
-              placeholder="📍 Delivery Address" 
-            />
-            <button class="checkout-btn" onclick="checkout()" id="checkoutBtn" disabled>
-              ✨ Complete Checkout
-            </button>
+            <div class="checkout-section">
+              <input type="tel" id="phone" class="checkout-input" placeholder="📱 Phone Number" />
+              <input type="text" id="address" class="checkout-input" placeholder="📍 Delivery Address" />
+              <button class="checkout-btn" onclick="checkout()" id="checkoutBtn" disabled>✨ Complete Checkout</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
 
     <!-- Profile Section -->
@@ -1588,12 +1439,9 @@
         <div class="profile-name" id="profileName">Loading...</div>
         <div class="profile-email" id="profileEmail">Loading...</div>
       </div>
-
       <div class="profile-grid">
         <div class="profile-info-card">
-          <div class="section-title" style="margin-bottom: 1.5rem;">
-            📋 Account Info
-          </div>
+          <div class="section-title" style="margin-bottom: 1.5rem;">📋 Account Info</div>
           <div class="info-item">
             <span class="info-label">Username</span>
             <span class="info-value" id="infoUsername">-</span>
@@ -1606,15 +1454,10 @@
             <span class="info-label">Total Orders</span>
             <span class="info-value" id="infoTotalOrders">0</span>
           </div>
-          <button class="back-to-shop-btn" onclick="toggleProfile()" style="width: 100%;">
-            🏪 Back to Shop
-          </button>
+          <button class="back-to-shop-btn" onclick="toggleProfile()" style="width: 100%;">🏪 Back to Shop</button>
         </div>
-
         <div class="orders-section">
-          <div class="orders-title">
-            📦 Order History
-          </div>
+          <div class="orders-title">📦 Order History</div>
           <div class="orders-list" id="ordersList">
             <div class="loading-spinner">⌛</div>
           </div>
@@ -1624,9 +1467,7 @@
 
     <!-- API Response -->
     <div class="section api-response">
-      <div class="section-title">
-        📡 API Response
-      </div>
+      <div class="section-title">📡 API Response</div>
       <pre class="response-content" id="output">No requests made yet...</pre>
     </div>
   </div>
@@ -1637,7 +1478,8 @@
     const LOGIN_URL = "https://modashopbackend-production.up.railway.app/api/auth/login";
     const REGISTER_URL = "https://modashopbackend-production.up.railway.app/api/auth/register/";
     const PASSWORD_CHANGE_URL = "https://modashopbackend-production.up.railway.app/api/auth/password/change";
-    const PROFILE_URL = "https://modashopbackend-production.up.railway.app/me";
+    const PROFILE_URL = "https://modashopbackend-production.up.railway.app/me/";
+    const PAYMENT_URL = "https://modashopbackend-production.up.railway.app/api/payments/pay/";
     
     let products = [];
     let productQuantities = {};
@@ -1646,13 +1488,6 @@
     let currentUser = null;
     let profileData = null;
 
-    // Add CORS mode to fetch requests
-    const fetchOptions = {
-      mode: 'cors',
-      credentials: 'omit'
-    };
-
-    // Product emoji mapping based on common categories
     const emojiMap = {
       'laptop': '💻', 'computer': '💻', 'pc': '💻',
       'mouse': '🖱️', 'keyboard': '⌨️',
@@ -1673,7 +1508,7 @@
       'book': '📚', 'notebook': '📓',
       'bag': '🎒', 'backpack': '🎒',
       'chair': '🪑', 'desk': '🪑',
-      'clock': '⏰', 'watch': '⌚',
+      'clock': '⏰',
       'glasses': '👓', 'sunglasses': '🕶️',
       'shirt': '👕', 'tshirt': '👕',
       'shoe': '👟', 'sneaker': '👟',
@@ -1683,43 +1518,30 @@
     function getProductEmoji(name, description = '') {
       const searchText = (name + ' ' + description).toLowerCase();
       for (const [key, emoji] of Object.entries(emojiMap)) {
-        if (searchText.includes(key)) {
-          return emoji;
-        }
+        if (searchText.includes(key)) return emoji;
       }
       return emojiMap.default;
     }
 
-    // Initialize
     async function init() {
       checkAuthStatus();
       await loadProducts();
       renderProducts();
     }
 
-    // Tab Switching
     function switchTab(tabName) {
-      // Update tab buttons
-      const tabButtons = document.querySelectorAll('.tab-btn');
-      tabButtons.forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       event.target.classList.add('active');
-
-      // Update tab content
-      const tabContents = document.querySelectorAll('.tab-content');
-      tabContents.forEach(content => content.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
       document.getElementById(tabName + 'Tab').classList.add('active');
-
-      // Clear error messages
       document.getElementById('loginError').style.display = 'none';
       document.getElementById('registerError').style.display = 'none';
       document.getElementById('resetError').style.display = 'none';
     }
 
-    // Authentication Functions
     function checkAuthStatus() {
       const savedToken = localStorage.getItem('authToken');
       const savedUser = localStorage.getItem('currentUser');
-      
       if (savedToken && savedUser) {
         authToken = savedToken;
         currentUser = JSON.parse(savedUser);
@@ -1737,7 +1559,6 @@
       const authText = document.getElementById('authText');
       const logoutBtn = document.getElementById('logoutBtn');
       const profileBtn = document.getElementById('profileBtn');
-      
       if (isLoggedIn) {
         authStatus.className = 'auth-status logged-in';
         authText.innerHTML = `✅ ${currentUser.username || 'User'}`;
@@ -1761,75 +1582,47 @@
 
     async function handleLogin(event) {
       event.preventDefault();
-      
       const email = document.getElementById('loginEmail').value;
       const username = document.getElementById('loginUsername').value;
       const password = document.getElementById('loginPassword').value;
       const submitBtn = document.getElementById('loginSubmitBtn');
       const errorDiv = document.getElementById('loginError');
-      
-      // Disable button and show loading
       submitBtn.disabled = true;
       submitBtn.textContent = '🔄 Logging in...';
       errorDiv.style.display = 'none';
-      
       try {
         const response = await fetch(LOGIN_URL, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            email: email,
-            username: username,
-            password: password
-          })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, username, password })
         });
-        
         const data = await response.json();
         show(data);
-        
         if (response.ok) {
-          // Store token and user info
           authToken = data.token || data.key || data.auth_token;
-          currentUser = { 
-            email: email, 
-            username: username,
-            ...data.user 
-          };
-          
+          currentUser = { email, username, ...data.user };
           localStorage.setItem('authToken', authToken);
           localStorage.setItem('currentUser', JSON.stringify(currentUser));
           document.getElementById('token').value = authToken;
-          
-          // Show success
           errorDiv.className = 'success-message';
           errorDiv.textContent = '✅ Login successful!';
           errorDiv.style.display = 'block';
-          
-          // Update UI
           updateAuthUI(true);
-          
-          // Hide modal after delay
           setTimeout(() => {
             hideAuthModal();
             loadCart();
           }, 1000);
-          
         } else {
-          // Show error
           errorDiv.className = 'error-message';
-          errorDiv.textContent = data.message || data.error || 'Login failed. Please check your credentials.';
+          errorDiv.textContent = data.message || data.error || 'Login failed';
           errorDiv.style.display = 'block';
         }
       } catch (error) {
-        console.error('Login error:', error);
         errorDiv.className = 'error-message';
         errorDiv.textContent = '❌ Connection error: ' + error.message;
         errorDiv.style.display = 'block';
         show({ error: error.message });
       } finally {
-        // Re-enable button
         submitBtn.disabled = false;
         submitBtn.textContent = '🚀 Login';
       }
@@ -1837,85 +1630,59 @@
 
     async function handleRegister(event) {
       event.preventDefault();
-      
       const email = document.getElementById('registerEmail').value;
       const username = document.getElementById('registerUsername').value;
       const password = document.getElementById('registerPassword').value;
       const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
       const submitBtn = document.getElementById('registerSubmitBtn');
       const errorDiv = document.getElementById('registerError');
-      
-      // Check passwords match
       if (password !== passwordConfirm) {
         errorDiv.className = 'error-message';
         errorDiv.textContent = '❌ Passwords do not match!';
         errorDiv.style.display = 'block';
         return;
       }
-      
-      // Disable button and show loading
       submitBtn.disabled = true;
       submitBtn.textContent = '🔄 Creating account...';
       errorDiv.style.display = 'none';
-      
       try {
         const response = await fetch(REGISTER_URL, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            email: email,
-            username: username,
-            password: password,
-            password_confirm: passwordConfirm,
-          })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, username, password, password_confirm: passwordConfirm })
         });
-        
         const data = await response.json();
         show(data);
-        
         if (response.ok) {
-          // Show success
           errorDiv.className = 'success-message';
           errorDiv.textContent = '✅ Account created! Please login.';
           errorDiv.style.display = 'block';
-          
-          // Clear form
           document.getElementById('registerEmail').value = '';
           document.getElementById('registerUsername').value = '';
           document.getElementById('registerPassword').value = '';
           document.getElementById('registerPasswordConfirm').value = '';
-          
-          // Switch to login tab after delay
           setTimeout(() => {
             switchTab('login');
-            // Pre-fill login form
             document.getElementById('loginEmail').value = email;
             document.getElementById('loginUsername').value = username;
           }, 1500);
-          
         } else {
-          // Show error
           let errorMessage = 'Registration failed. ';
           if (data.email) errorMessage += 'Email: ' + data.email.join(' ');
           if (data.username) errorMessage += 'Username: ' + data.username.join(' ');
           if (data.password) errorMessage += 'Password: ' + data.password.join(' ');
           if (data.message) errorMessage = data.message;
           if (data.error) errorMessage = data.error;
-          
           errorDiv.className = 'error-message';
           errorDiv.textContent = '❌ ' + errorMessage;
           errorDiv.style.display = 'block';
         }
       } catch (error) {
-        console.error('Registration error:', error);
         errorDiv.className = 'error-message';
         errorDiv.textContent = '❌ Connection error: ' + error.message;
         errorDiv.style.display = 'block';
         show({ error: error.message });
       } finally {
-        // Re-enable button
         submitBtn.disabled = false;
         submitBtn.textContent = '✨ Create Account';
       }
@@ -1923,34 +1690,26 @@
 
     async function handlePasswordReset(event) {
       event.preventDefault();
-      
       const oldPassword = document.getElementById('resetOldPassword').value;
       const newPassword = document.getElementById('resetNewPassword').value;
       const newPasswordConfirm = document.getElementById('resetNewPasswordConfirm').value;
       const submitBtn = document.getElementById('resetSubmitBtn');
       const errorDiv = document.getElementById('resetError');
-      
-      // Check passwords match
       if (newPassword !== newPasswordConfirm) {
         errorDiv.className = 'error-message';
         errorDiv.textContent = '❌ New passwords do not match!';
         errorDiv.style.display = 'block';
         return;
       }
-      
-      // Check if user is logged in
       if (!authToken) {
         errorDiv.className = 'error-message';
-        errorDiv.textContent = '❌ You must be logged in to reset password!';
+        errorDiv.textContent = '❌ You must be logged in!';
         errorDiv.style.display = 'block';
         return;
       }
-      
-      // Disable button and show loading
       submitBtn.disabled = true;
-      submitBtn.textContent = '🔄 Resetting password...';
+      submitBtn.textContent = '🔄 Resetting...';
       errorDiv.style.display = 'none';
-      
       try {
         const response = await fetch(PASSWORD_CHANGE_URL, {
           method: 'POST',
@@ -1958,52 +1717,35 @@
             'Authorization': `Token ${authToken}`,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({
-            old_password: oldPassword,
-            new_password: newPassword
-          })
+          body: JSON.stringify({ old_password: oldPassword, new_password: newPassword })
         });
-        
         const data = await response.json();
         show(data);
-        
         if (response.ok) {
-          // Show success
           errorDiv.className = 'success-message';
           errorDiv.textContent = '✅ Password reset successfully!';
           errorDiv.style.display = 'block';
-          
-          // Clear form
           document.getElementById('resetOldPassword').value = '';
           document.getElementById('resetNewPassword').value = '';
           document.getElementById('resetNewPasswordConfirm').value = '';
-          
-          // Hide modal after delay
-          setTimeout(() => {
-            hideAuthModal();
-          }, 1500);
-          
+          setTimeout(() => hideAuthModal(), 1500);
         } else {
-          // Show error
           let errorMessage = 'Password reset failed. ';
-          if (data.old_password) errorMessage += 'Old password: ' + data.old_password.join(' ');
-          if (data.new_password) errorMessage += 'New password: ' + data.new_password.join(' ');
+          if (data.old_password) errorMessage += data.old_password.join(' ');
+          if (data.new_password) errorMessage += data.new_password.join(' ');
           if (data.message) errorMessage = data.message;
           if (data.error) errorMessage = data.error;
           if (data.detail) errorMessage = data.detail;
-          
           errorDiv.className = 'error-message';
           errorDiv.textContent = '❌ ' + errorMessage;
           errorDiv.style.display = 'block';
         }
       } catch (error) {
-        console.error('Password reset error:', error);
         errorDiv.className = 'error-message';
         errorDiv.textContent = '❌ Connection error: ' + error.message;
         errorDiv.style.display = 'block';
         show({ error: error.message });
       } finally {
-        // Re-enable button
         submitBtn.disabled = false;
         submitBtn.textContent = '🔑 Reset Password';
       }
@@ -2019,30 +1761,21 @@
         document.getElementById('token').value = '';
         updateAuthUI(false);
         showAuthModal();
-        
-        // Hide profile and show shop
         document.getElementById('profileSection').classList.remove('active');
         document.getElementById('shopSection').classList.remove('hidden');
-        
-        // Clear cart display
         currentCart = { items: [] };
         renderCart();
-        
         show({ message: 'Logged out successfully' });
       }
     }
 
-    // Profile Functions
     async function toggleProfile() {
       const profileSection = document.getElementById('profileSection');
       const shopSection = document.getElementById('shopSection');
-      
       if (profileSection.classList.contains('active')) {
-        // Hide profile, show shop
         profileSection.classList.remove('active');
         shopSection.classList.remove('hidden');
       } else {
-        // Show profile, hide shop
         profileSection.classList.add('active');
         shopSection.classList.add('hidden');
         await loadProfile();
@@ -2054,33 +1787,18 @@
         alert('Please login first!');
         return;
       }
-
-      // Show loading state
       document.getElementById('ordersList').innerHTML = '<div class="loading-spinner">⌛</div>';
-
       try {
-        // Try the primary endpoint
-        let response = await fetch(PROFILE_URL, {
+        const response = await fetch(PROFILE_URL, {
           method: 'GET',
           headers: getHeaders()
         });
-
-        // If primary fails, try alternative endpoint
-        if (!response.ok && response.status === 404) {
-          response = await fetch("http://127.0.0.1:8000/api/profile/me/", {
-            method: 'GET',
-            headers: getHeaders()
-          });
-        }
-
         const data = await response.json();
         show(data);
-
         if (response.ok) {
           profileData = data;
           renderProfile();
         } else {
-          console.error('Failed to load profile:', data);
           document.getElementById('ordersList').innerHTML = `
             <div class="no-orders">
               <div class="no-orders-icon">❌</div>
@@ -2090,25 +1808,12 @@
           `;
         }
       } catch (error) {
-        console.error('Error loading profile:', error);
         show({ error: error.message });
-        
-        // Show detailed error message
         document.getElementById('ordersList').innerHTML = `
           <div class="no-orders">
             <div class="no-orders-icon">⚠️</div>
             <div>Connection Error</div>
-            <div style="margin-top: 0.5rem; font-size: 0.9rem;">
-              Could not connect to the profile API.<br>
-              Make sure:<br>
-              • Your API server is running<br>
-              • The endpoint is <code>http://127.0.0.1:8000/api/profile/me</code><br>
-              • CORS is enabled on your backend<br>
-              • You are logged in with a valid token
-            </div>
-            <button class="back-to-shop-btn" onclick="toggleProfile()" style="margin-top: 1rem;">
-              Back to Shop
-            </button>
+            <button class="back-to-shop-btn" onclick="toggleProfile()" style="margin-top: 1rem;">Back to Shop</button>
           </div>
         `;
       }
@@ -2116,32 +1821,22 @@
 
     function renderProfile() {
       if (!profileData) return;
-
-      // Handle different response formats
       const userData = profileData.user || profileData;
       const username = userData.username || currentUser?.username || 'User';
       const email = userData.email || currentUser?.email || 'No email';
-
-      // Update header
       const firstLetter = username[0].toUpperCase();
       document.getElementById('profileAvatar').textContent = firstLetter;
       document.getElementById('profileName').textContent = username;
       document.getElementById('profileEmail').textContent = email;
-
-      // Update info card
       document.getElementById('infoUsername').textContent = username;
       document.getElementById('infoEmail').textContent = email;
-      
-      // Handle orders - could be in different places
       const orders = profileData.orders || profileData.previous_orders || userData.orders || [];
       document.getElementById('infoTotalOrders').textContent = orders.length;
-
       renderOrders(orders);
     }
 
     function renderOrders(orders) {
       const ordersList = document.getElementById('ordersList');
-
       if (!orders || orders.length === 0) {
         ordersList.innerHTML = `
           <div class="no-orders">
@@ -2152,37 +1847,29 @@
         `;
         return;
       }
-
       ordersList.innerHTML = orders.map(order => {
         const orderItems = order.items || order.order_items || [];
-        
-        // Handle date formatting
         let orderDate = 'N/A';
         if (order.created_at || order.date || order.created) {
-          const dateStr = order.created_at || order.date || order.created;
           try {
-            orderDate = new Date(dateStr).toLocaleDateString('en-US', {
+            orderDate = new Date(order.created_at || order.date || order.created).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'short',
               day: 'numeric'
             });
           } catch (e) {
-            orderDate = dateStr;
+            orderDate = order.created_at || order.date || order.created;
           }
         }
-        
-        // Determine status class
         let statusClass = 'pending';
         const status = (order.status || 'pending').toLowerCase();
-        if (status.includes('complete') || status.includes('delivered')) {
+        if (status.includes('complete') || status.includes('delivered') || status.includes('paid')) {
           statusClass = 'completed';
         } else if (status.includes('cancel')) {
           statusClass = 'cancelled';
         } else if (status.includes('process') || status.includes('ship')) {
           statusClass = 'processing';
         }
-
-        // Calculate total if not provided
         let totalPrice = order.total_price || order.total || 0;
         if (!totalPrice && orderItems.length > 0) {
           totalPrice = orderItems.reduce((sum, item) => {
@@ -2190,7 +1877,7 @@
             return sum + (parseFloat(product.price) * (item.quantity || 1));
           }, 0);
         }
-
+        const showPayButton = status.toLowerCase() === 'pending';
         return `
           <div class="order-card">
             <div class="order-header">
@@ -2198,20 +1885,15 @@
                 <div class="order-id">Order #${order.id || order.order_id || 'N/A'}</div>
                 <div class="order-date">${orderDate}</div>
               </div>
-              <div class="order-status ${statusClass}">
-                ${order.status || 'Pending'}
-              </div>
+              <div class="order-status ${statusClass}">${order.status || 'Pending'}</div>
             </div>
-
             ${orderItems.length > 0 ? `
               <div class="order-items">
                 ${orderItems.map(item => {
                   const productId = item.product || item.product_id;
-                  const product = products.find(p => p.id == productId) || 
-                                 { name: `Product ${productId}`, price: 0, emoji: '📦' };
+                  const product = products.find(p => p.id == productId) || { name: `Product ${productId}`, price: 0, emoji: '📦' };
                   const quantity = item.quantity || 1;
                   const itemPrice = parseFloat(product.price) * quantity;
-                  
                   return `
                     <div class="order-item">
                       <div class="order-item-emoji">${product.emoji}</div>
@@ -2224,15 +1906,15 @@
                   `;
                 }).join('')}
               </div>
-            ` : '<div style="padding: 1rem; text-align: center; color: var(--text-light);">No items in this order</div>'}
-
+            ` : '<div style="padding: 1rem; text-align: center; color: var(--text-light);">No items</div>'}
             <div class="order-footer">
               <div class="order-info">
                 ${order.phone ? `<div class="order-phone">📱 ${order.phone}</div>` : ''}
                 ${order.address ? `<div class="order-address">📍 ${order.address}</div>` : ''}
               </div>
-              <div class="order-total">
-                Total: $${parseFloat(totalPrice).toFixed(2)}
+              <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <div class="order-total">Total: $${parseFloat(totalPrice).toFixed(2)}</div>
+                ${showPayButton ? `<button class="pay-order-btn" onclick="payForOrder(${order.id || order.order_id})">💳 Pay Now</button>` : ''}
               </div>
             </div>
           </div>
@@ -2240,32 +1922,45 @@
       }).join('');
     }
 
+    async function payForOrder(orderId) {
+      if (!authToken) {
+        alert('Please login first!');
+        return;
+      }
+      if (!confirm(`Proceed with payment for Order #${orderId}?`)) return;
+      try {
+        const response = await fetch(`${PAYMENT_URL}${orderId}/`, {
+          method: 'POST',
+          headers: getHeaders() 
+        });
+        const data = await response.json();
+        console.log('Payment response:', data);
+        show(data);
+        if (response.ok) {
+          alert('✅ Payment successful!');
+          await loadProfile();
+        } else {
+          alert('❌ Payment failed: ' + (data.detail || data.error || 'Unknown error'));
+        }
+      } catch (error) {
+        show({ error: error.message });
+        alert('❌ Payment error: ' + error.message);
+      }
+    }
+
     async function loadProducts() {
       try {
         const response = await fetch(PRODUCTS_URL);
         const data = await response.json();
-        
         if (response.ok) {
-          // Handle both array response and object with results
           products = Array.isArray(data) ? data : (data.results || []);
-          
-          // Add emoji to each product
-          products = products.map(p => ({
-            ...p,
-            emoji: getProductEmoji(p.name, p.description || '')
-          }));
-          
-          // Initialize quantities
+          products = products.map(p => ({ ...p, emoji: getProductEmoji(p.name, p.description || '') }));
           products.forEach(p => productQuantities[p.id] = 1);
-          
-          console.log('Loaded products:', products);
         } else {
-          console.error('Failed to load products:', data);
-          show({ error: 'Failed to load products from API' });
+          show({ error: 'Failed to load products' });
         }
       } catch (error) {
-        console.error('Error loading products:', error);
-        show({ error: 'Could not connect to products API: ' + error.message });
+        show({ error: 'Could not connect: ' + error.message });
       }
     }
 
@@ -2283,7 +1978,6 @@
 
     function renderProducts() {
       const grid = document.getElementById("productsGrid");
-      
       if (products.length === 0) {
         grid.innerHTML = `
           <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-light);">
@@ -2293,12 +1987,9 @@
         `;
         return;
       }
-      
       grid.innerHTML = products.map(product => `
         <div class="product-card">
-          <div class="product-image">
-            <span>${product.emoji}</span>
-          </div>
+          <div class="product-image"><span>${product.emoji}</span></div>
           <div class="product-info">
             <div class="product-name">${product.name}</div>
             <div class="product-id">ID: ${product.id}</div>
@@ -2309,9 +2000,7 @@
                 <div class="qty-display" id="qty-${product.id}">1</div>
                 <button class="qty-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
               </div>
-              <button class="add-to-cart-btn" onclick="addToCart(${product.id})">
-                Add to Cart
-              </button>
+              <button class="add-to-cart-btn" onclick="addToCart(${product.id})">Add to Cart</button>
             </div>
           </div>
         </div>
@@ -2327,23 +2016,15 @@
 
     async function addToCart(productId) {
       const quantity = productQuantities[productId] || 1;
-      
       try {
         const response = await fetch(BASE_URL + "add_item/", {
           method: "POST",
           headers: getHeaders(),
-          body: JSON.stringify({
-            product: productId,
-            quantity: quantity
-          })
+          body: JSON.stringify({ product: productId, quantity })
         });
-        
         const data = await response.json();
         show(data);
-        
-        if (response.ok) {
-          await loadCart();
-        }
+        if (response.ok) await loadCart();
       } catch (error) {
         show({ error: error.message });
       }
@@ -2351,13 +2032,9 @@
 
     async function loadCart() {
       try {
-        const response = await fetch(BASE_URL, {
-          headers: getHeaders()
-        });
-        
+        const response = await fetch(BASE_URL, { headers: getHeaders() });
         const data = await response.json();
         show(data);
-        
         if (response.ok) {
           currentCart = data;
           renderCart();
@@ -2372,28 +2049,18 @@
       const cartCount = document.getElementById("cartCount");
       const cartSummary = document.getElementById("cartSummary");
       const checkoutBtn = document.getElementById("checkoutBtn");
-      
       if (!currentCart.items || currentCart.items.length === 0) {
-        cartItemsDiv.innerHTML = `
-          <div class="empty-cart">
-            <div class="empty-cart-icon">🛍️</div>
-            <div>Your cart is empty</div>
-          </div>
-        `;
+        cartItemsDiv.innerHTML = `<div class="empty-cart"><div class="empty-cart-icon">🛍️</div><div>Your cart is empty</div></div>`;
         cartSummary.style.display = 'none';
         cartCount.textContent = '0';
         checkoutBtn.disabled = true;
         return;
       }
-
       cartCount.textContent = currentCart.items.length;
       cartSummary.style.display = 'block';
       checkoutBtn.disabled = false;
-
       cartItemsDiv.innerHTML = currentCart.items.map(item => {
-        const product = products.find(p => p.id == item.product) || 
-                       { name: `Product ${item.product}`, price: 0, emoji: "📦" };
-        
+        const product = products.find(p => p.id == item.product) || { name: `Product ${item.product}`, price: 0, emoji: "📦" };
         return `
           <div class="cart-item">
             <div class="cart-item-image">${product.emoji}</div>
@@ -2410,14 +2077,11 @@
           </div>
         `;
       }).join('');
-
-      // Calculate totals
       const totalItems = currentCart.items.reduce((sum, item) => sum + item.quantity, 0);
       const totalPrice = currentCart.items.reduce((sum, item) => {
         const product = products.find(p => p.id == item.product) || { price: 0 };
         return sum + (parseFloat(product.price) * item.quantity);
       }, 0);
-
       document.getElementById('itemCount').textContent = totalItems;
       document.getElementById('cartTotal').textContent = `$${totalPrice.toFixed(2)}`;
     }
@@ -2427,23 +2091,15 @@
         await removeFromCart(productId);
         return;
       }
-
       try {
         const response = await fetch(BASE_URL + "update_quantity/", {
           method: "POST",
           headers: getHeaders(),
-          body: JSON.stringify({
-            product: productId,
-            quantity: newQuantity
-          })
+          body: JSON.stringify({ product: productId, quantity: newQuantity })
         });
-        
         const data = await response.json();
         show(data);
-        
-        if (response.ok) {
-          await loadCart();
-        }
+        if (response.ok) await loadCart();
       } catch (error) {
         show({ error: error.message });
       }
@@ -2454,17 +2110,11 @@
         const response = await fetch(BASE_URL + "remove_item/", {
           method: "POST",
           headers: getHeaders(),
-          body: JSON.stringify({
-            product: productId
-          })
+          body: JSON.stringify({ product: productId })
         });
-        
         const data = await response.json();
         show(data);
-        
-        if (response.ok) {
-          await loadCart();
-        }
+        if (response.ok) await loadCart();
       } catch (error) {
         show({ error: error.message });
       }
@@ -2473,27 +2123,29 @@
     async function checkout() {
       const phone = document.getElementById("phone").value;
       const address = document.getElementById("address").value;
-
       if (!phone || !address) {
-        alert("Please fill in both phone and address fields!");
+        alert("Please fill in both phone and address!");
         return;
       }
-
       try {
         const response = await fetch(BASE_URL + "checkout/", {
           method: "POST",
           headers: getHeaders(),
-          body: JSON.stringify({
-            phone: phone,
-            address: address
-          })
+          body: JSON.stringify({ phone, address })
         });
-        
         const data = await response.json();
         show(data);
-        
         if (response.ok) {
-          alert("✅ Checkout successful!");
+          const orderId = data.order?.id || data.order_id || data.id;
+          if (orderId) {
+            if (confirm("✅ Order placed! Would you like to pay now?")) {
+              await payForOrder(orderId);
+            } else {
+              alert("Order placed! Pay later from your profile.");
+            }
+          } else {
+            alert("✅ Checkout successful!");
+          }
           document.getElementById("phone").value = "";
           document.getElementById("address").value = "";
           await loadCart();
@@ -2503,7 +2155,6 @@
       }
     }
 
-    // Initialize on load
     init();
   </script>
 </body>
