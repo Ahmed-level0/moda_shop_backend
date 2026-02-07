@@ -78,7 +78,7 @@ class PayOrderView(APIView):
                 },
                 "currency": "EGP",
                 "integration_id": settings.PAYMOB_INTEGRATION_ID,
-                "redirection_url": "http://localhost:8000/api/payments/callback/", # Update as needed
+                "redirection_url": "https://modashopbackend-production.up.railway.app/api/payments/callback/", # Update as needed
             }
         ).json()
 
