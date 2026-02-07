@@ -1632,12 +1632,12 @@
   </div>
 
   <script>
-    const BASE_URL = "http://127.0.0.1:8000/api/cart/";
-    const PRODUCTS_URL = "http://127.0.0.1:8000/api/products/";
-    const LOGIN_URL = "http://127.0.0.1:8000/api/auth/login";
-    const REGISTER_URL = "http://127.0.0.1:8000/api/auth/register/";
-    const PASSWORD_CHANGE_URL = "http://127.0.0.1:8000/api/auth/password/change";
-    const PROFILE_URL = "http://127.0.0.1:8000/api/profile/me";
+    const BASE_URL = "https://modashopbackend-production.up.railway.app/api/cart/";
+    const PRODUCTS_URL = "https://modashopbackend-production.up.railway.app/api/products/";
+    const LOGIN_URL = "https://modashopbackend-production.up.railway.app/api/auth/login";
+    const REGISTER_URL = "https://modashopbackend-production.up.railway.app/api/auth/register/";
+    const PASSWORD_CHANGE_URL = "https://modashopbackend-production.up.railway.app/api/auth/password/change";
+    const PROFILE_URL = "https://modashopbackend-production.up.railway.app/me";
     
     let products = [];
     let productQuantities = {};
@@ -1867,7 +1867,8 @@
           body: JSON.stringify({
             email: email,
             username: username,
-            password: password
+            password: password,
+            password_confirm: passwordConfirm,
           })
         });
         

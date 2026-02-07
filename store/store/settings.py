@@ -39,7 +39,6 @@ PAYMOB_API_KEY = os.getenv("PAYMOB_API_KEY")
 PAYMOB_INTEGRATION_ID = os.getenv("PAYMOB_INTEGRATION_ID")
 PAYMOB_IFRAME_ID = os.getenv("PAYMOB_IFRAME_ID")
 PAYMOB_HMAC_SECRET = os.getenv("PAYMOB_HMAC_SECRET")
-DEFAULT_FROM_EMAIL= os.getenv("ADMIN_EMAIL")
 
 # Application definition
 
@@ -81,7 +80,13 @@ LOGIN_ON_EMAIL_CONFIRMATION = True
 
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" # Development
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend" # Production 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL= os.getenv("ADMIN_EMAIL")
+EMAIL_HOST_USER = DEFAULT_FROM_EMAIL
+EMAIL_HOST_PASSWORD = os.getenv("APP_PASSWORD")
 
 CORS_ALLOWED_ORIGINS = [
     # "https://your-frontend-domain.com",
@@ -128,8 +133,8 @@ MIDDLEWARE = [
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-CSRF_TRUSTED_ORIGINS = [ # for ngrok testing (Development only)
-    "https://modashopbackend-production.up.railway.app",
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.up.railway.app",
 ]
 
 CORS_ALLOW_HEADERS = [
