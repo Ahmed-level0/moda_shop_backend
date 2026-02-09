@@ -39,6 +39,16 @@ class PayOrderView(APIView):
         if not token:
             return Response({"error": "Paymob auth failed"}, status=500)
 
+        # Check stock first
+        with transaction.atomic():
+            order = Order.objects.select_for_update().get(id=order.id)
+            for item in order.items.select_related("product").select_for_update():
+                if item.product.stock < item.quantity:
+                    return Response(
+                        {"error": f"Not enough stock for {item.product.name} only {item.product.stock} left"},
+                        status=409
+                )
+        
         # Create Paymob Order
         order_response = requests.post(
             "https://accept.paymob.com/api/ecommerce/orders",
@@ -52,6 +62,7 @@ class PayOrderView(APIView):
         ).json()
 
         paymob_order_id = order_response.get("id") # The id on Paymob site
+
         
         order.payment_reference = paymob_order_id
         order.save()
@@ -263,15 +274,6 @@ def paymob_callback(request):
                         with transaction.atomic():
                             # Lock order row
                             order = Order.objects.select_for_update().get(id=order.id)
-
-                            # Check stock first
-                            for item in order.items.select_related("product").select_for_update():
-                                if item.product.stock < item.quantity:
-                                    return Response(
-                                        {"error": f"Not enough stock for {item.product.name} only {item.product.stock} left"},
-                                        status=409
-                                    )
-
                             # Deduct stock
                             for item in order.items.all():
                                 item.product.stock = F('stock') - item.quantity
@@ -293,15 +295,6 @@ def paymob_callback(request):
                     with transaction.atomic():
                         # Lock order row
                         order = Order.objects.select_for_update().get(id=order.id)
-
-                        # Check stock first
-                        for item in order.items.select_related("product").select_for_update():
-                            if item.product.stock < item.quantity:
-                                return Response(
-                                    {"error": f"Not enough stock for {item.product.name} only {item.product.stock} left"},
-                                    status=409
-                                )
-
                         # Deduct stock
                         for item in order.items.all():
                             item.product.stock = F('stock') - item.quantity
