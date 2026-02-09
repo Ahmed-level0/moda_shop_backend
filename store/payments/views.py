@@ -96,9 +96,11 @@ def paymob_webhook(request):
     try:
         data = request.data
         obj = data.get("obj", {})
-        
+        print(data)
+        print(obj)
         # Paymob sends the HMAC in the query params
         received_hmac = request.query_params.get("hmac")
+        print(received_hmac)
 
         # 1. Extract the specific fields required for HMAC calculation
         # Order allows for flexibility but these are the standard fields for Paymob's HMAC
@@ -148,6 +150,8 @@ def paymob_webhook(request):
             hashlib.sha512
         ).hexdigest()
 
+        print(received_hmac)
+        print(calculated_hmac)
         # 3. Secure Comparison
         if not hmac.compare_digest(received_hmac, calculated_hmac):
             return Response({"error": "Invalid HMAC"}, status=403)
