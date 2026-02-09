@@ -78,7 +78,7 @@ class PayOrderView(APIView):
                 },
                 "currency": "EGP",
                 "integration_id": settings.PAYMOB_INTEGRATION_ID,
-                # "redirection_url": "https://modashopbackend-production.up.railway.app/api/payments/callback/", # Update as needed
+                "redirection_url": "https://modashopbackend-production.up.railway.app/api/payments/callback/",
             }
         ).json()
 
@@ -198,20 +198,83 @@ def check_paymob_payment(paymob_order_id):
 
 @api_view(["GET"])
 def paymob_callback(request):
+    try:
+        # Paymob sends data in query params
+        data = request.query_params.dict()
+        
+        # 1. Verify HMAC first (Avoiding API Call if possible)
+        received_hmac = data.get("hmac")
+        
+        # Consistent HMAC fields for redirection (might differ slightly from Webhook, but usually same set)
+        hmac_fields = [
+            "amount_cents",
+            "created_at",
+            "currency",
+            "error_occured",
+            "has_parent_transaction",
+            "id",
+            "integration_id",
+            "is_3d_secure",
+            "is_auth",
+            "is_capture",
+            "is_refunded",
+            "is_standalone_payment",
+            "is_voided",
+            "order",
+            "owner",
+            "pending",
+            "source_data.pan",
+            "source_data.sub_type",
+            "source_data.type",
+            "success",
+        ]
+        
+        concatenated_values = ""
+        for field in hmac_fields:
+            value = data.get(field)
+            # Boolean/None handling
+            if value is None:
+                value = "" # In query params, missing often means empty or not present
+            else:
+                # Paymob query params are strings, so "true" is "true".
+                # But we need to ensure consistent formatting if needed.
+                # Usually they come as strings already.
+                pass 
+                
+            concatenated_values += str(value)
 
-    data = request.GET.dict()
+        calculated_hmac = hmac.new(
+            settings.PAYMOB_HMAC_SECRET.encode(),
+            concatenated_values.encode(),
+            hashlib.sha512
+        ).hexdigest()
 
-    paymob_order_id = data.get("order")
+        # If HMAC matches, we can trust the data
+        if hmac.compare_digest(received_hmac, calculated_hmac):
+             if data.get("success") == "true":
+                paymob_order_id = data.get("order")
+                try:
+                    order = Order.objects.get(payment_reference=paymob_order_id)
+                    if order.status != 'paid':
+                        order.status = "paid"
+                        order.save()
+                    return Response({"message": "Payment Successful", "order_id": order.id})
+                except Order.DoesNotExist:
+                     return Response({"error": "Order not found"}, status=404)
+        
+        # Fallback: Check via API if HMAC fails or just to be sure
+        paymob_order_id = data.get("order")
+        if paymob_order_id and check_paymob_payment(paymob_order_id):
+             try:
+                order = Order.objects.get(payment_reference=paymob_order_id)
+                if order.status != 'paid':
+                    order.status = "paid"
+                    order.save()
+                return Response({"message": "Payment Successful", "order_id": order.id})
+             except Order.DoesNotExist:
+                 return Response({"error": "Order not found"}, status=404)
 
-    if not paymob_order_id:
-        return Response("Invalid callback", status=400)
+        return Response({"error": "Payment Failed or Invalid"}, status=400)
 
-    result = check_paymob_payment(paymob_order_id)
-
-    if result is True:
-        order = Order.objects.get(payment_reference=paymob_order_id)
-        order.status = "paid"
-        order.save()
-        return Response("Payment Successful ✅")
-
-    return Response("Payment Failed ❌")
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
