@@ -1,6 +1,5 @@
-from django.db import models
-
 # Create your models here.
+
 from django.db import models
 from django.contrib.auth.models import User
 from products.models import Product
@@ -41,23 +40,3 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.product.name} x {self.quantity}"
-
-"""
-fetch("http://127.0.0.1:8000/api/cart/checkout/", {
-  method: "POST",
-  headers: {
-    "Authorization": "Token aaba293da77c18b4d823cc7780d1fe330e965b25",
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    phone: "01012345678",
-    address: "Nasr City, Cairo"
-  })
-})
-.then(res => res.json())
-.then(data => console.log(data))
-.catch(err => console.error(err));
-
-
-Method to test checkout API
-"""

@@ -13,9 +13,12 @@ from rest_framework.permissions import IsAuthenticated
 
 from orders.models import Order
 
+from django.db import transaction
+from django.db.models import F
 class PayOrderView(APIView):
     permission_classes = [IsAuthenticated]
 
+    # The method called when click on pay now
     def post(self, request, order_id):
         try:
             order = Order.objects.get(id=order_id, user=request.user)
@@ -78,9 +81,10 @@ class PayOrderView(APIView):
                 },
                 "currency": "EGP",
                 "integration_id": settings.PAYMOB_INTEGRATION_ID,
-                "redirection_url": "https://modashopbackend-production.up.railway.app/api/payments/callback/",
             }
         ).json()
+        
+        # "redirection_url": "http://127.0.0.1:8000/api/payments/callback/", # in case of development
 
         payment_token = payment_key_response.get("token") # The token used to generate the payment URL
 
@@ -256,8 +260,26 @@ def paymob_callback(request):
                 try:
                     order = Order.objects.get(payment_reference=paymob_order_id)
                     if order.status != 'paid':
-                        order.status = "paid"
-                        order.save()
+                        with transaction.atomic():
+                            # Lock order row
+                            order = Order.objects.select_for_update().get(id=order.id)
+
+                            # Check stock first
+                            for item in order.items.select_related("product").select_for_update():
+                                if item.product.stock < item.quantity:
+                                    return Response(
+                                        {"error": f"Not enough stock for {item.product.name} only {item.product.stock} left"},
+                                        status=409
+                                    )
+
+                            # Deduct stock
+                            for item in order.items.all():
+                                item.product.stock = F('stock') - item.quantity
+                                item.product.save()
+
+                            # Mark order paid
+                            order.status = "paid"
+                            order.save()
                     return Response({"message": "Payment Successful", "order_id": order.id})
                 except Order.DoesNotExist:
                      return Response({"error": "Order not found"}, status=404)
@@ -268,8 +290,26 @@ def paymob_callback(request):
              try:
                 order = Order.objects.get(payment_reference=paymob_order_id)
                 if order.status != 'paid':
-                    order.status = "paid"
-                    order.save()
+                    with transaction.atomic():
+                        # Lock order row
+                        order = Order.objects.select_for_update().get(id=order.id)
+
+                        # Check stock first
+                        for item in order.items.select_related("product").select_for_update():
+                            if item.product.stock < item.quantity:
+                                return Response(
+                                    {"error": f"Not enough stock for {item.product.name} only {item.product.stock} left"},
+                                    status=409
+                                )
+
+                        # Deduct stock
+                        for item in order.items.all():
+                            item.product.stock = F('stock') - item.quantity
+                            item.product.save()
+
+                        # Mark order paid
+                        order.status = "paid"
+                        order.save()
                 return Response({"message": "Payment Successful", "order_id": order.id})
              except Order.DoesNotExist:
                  return Response({"error": "Order not found"}, status=404)

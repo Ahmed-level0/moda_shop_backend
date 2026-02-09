@@ -79,6 +79,7 @@ class CartViewSet(viewsets.ViewSet):
         if not phone or not address:
             return Response({"error": "Phone and address required"}, status=400)
 
+        # Creating an order for the user
         order = Order.objects.create(
             user=request.user,
             total_price=cart.total_price,
@@ -87,11 +88,12 @@ class CartViewSet(viewsets.ViewSet):
             status='pending'
         )
 
+        # Creating and order item for each item in the cart
         for item in cart.items.all():
             OrderItem.objects.create(
                 order=order,
                 product=item.product,
-                quantity=item.quantity,
+                quantity=item.quantity if item.quantity <= item.product.stock else item.product.stock, # for safety
                 price=item.product.price
             )
         cart.is_active = False
@@ -103,42 +105,3 @@ class CartViewSet(viewsets.ViewSet):
             "order_id": order.id,
             "message": "Order created. Payment required."
         }, status=201)
-    
-
-"""
-# Confirm Payment API View (Simulation)
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from django.db import transaction
-from .models import Order
-from cart.models import Cart
-
-class ConfirmPaymentAPIView(APIView):
-    def post(self, request):
-        order_id = request.data.get('order_id')
-        payment_reference = request.data.get('payment_reference')
-
-        order = Order.objects.get(id=order_id)
-
-        if order.payment_status == 'paid':
-            return Response({"detail": "Order already paid"})
-
-        with transaction.atomic():
-            for item in order.items.all():
-                if item.quantity > item.product.stock:
-                    order.payment_status = 'failed'
-                    order.save()
-                    return Response({"error": "Not enough stock"}, status=400)
-
-                item.product.stock -= item.quantity
-                item.product.save()
-
-            order.payment_status = 'paid'
-            order.payment_reference = payment_reference
-            order.save()
-
-            Cart.objects.filter(user=order.user, is_active=True).update(is_active=False)
-
-        return Response({"success": "Payment confirmed"})
-    """
