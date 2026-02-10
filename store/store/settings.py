@@ -77,9 +77,7 @@ USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 LOGIN_ON_EMAIL_CONFIRMATION = True
-
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" # Development
-
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 # EMAIL_HOST = 'smtp.gmail.com'
