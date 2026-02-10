@@ -79,7 +79,6 @@ ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 LOGIN_ON_EMAIL_CONFIRMATION = True
 
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" # Development
-# Send Grid API key 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
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
