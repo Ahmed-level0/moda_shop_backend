@@ -1,166 +1,117 @@
-from django.db.models.signals import pre_save
+from django.db.models.signals import post_save, post_init
 from django.dispatch import receiver
 from django.core.mail import send_mail
-
-from .models import Order
 from django.conf import settings
+from .models import Order
 
-
-@receiver(pre_save, sender=Order)
-def order_status_changed(sender, instance, **kwargs):
-
-    # New order (no ID yet)
-    if not instance.pk:
-        return
-
+def send_order_email(subject, message, to_email):
     try:
-        old_order = Order.objects.get(pk=instance.pk)
-    except Order.DoesNotExist:
-        return
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [to_email],
+            fail_silently=False,
+        )
+    except Exception as e:
+        print(f"Failed to send email to {to_email}: {e}")
 
-    old_status = old_order.status
-    new_status = instance.status
+@receiver(post_init, sender=Order)
+def order_post_init(sender, instance, **kwargs):
+    """
+    Store the original status of the order when it is initialized.
+    This allows us to track status changes in post_save.
+    """
+    instance._original_status = instance.status
 
-    if old_status == new_status:
-        return
-
+@receiver(post_save, sender=Order)
+def order_status_changed(sender, instance, created, **kwargs):
+    # If the order is newly created, we might want to send a 'pending' (placed) email
+    # or just return if we only care about updates. 
+    # Based on previous logic, 'pending' was a status check. 
+    # If created, status is likely default ('pending').
+    
+    current_status = instance.status
+    original_status = getattr(instance, '_original_status', None)
+    
     user_email = instance.user.email
-
     if not user_email:
         return
-    
-    if new_status == 'pending':  
+
+    # Check if status has changed or if it's a new order with a specific initial status
+    if created or current_status != original_status:
         subject = f"Order #{instance.id} Update"
-        message = f"""
+        message = ""
+        
+        # Email Templates
+        if current_status == 'pending':
+            message = f"""
     Hello {instance.user.username},
 
-    Your order #{instance.id} has been place and waiting for payment.
+    Your order #{instance.id} has been placed and is waiting for payment.
     Total: {instance.total_price} EGP
 
     Thank you for shopping with us.
     Moda House.
-    """
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [user_email],
-            fail_silently=False,
-        )
-    
-    if new_status == 'cancelled':  
-        subject = f"Order #{instance.id} Update"
-        message = f"""
+            """
+        elif current_status == 'cancelled':
+            message = f"""
     Hello {instance.user.username},
 
-    Your order #{instance.id} has been cancelled under the demand of your's.
+    Your order #{instance.id} has been cancelled at your request.
 
     Thank you for shopping with us.
     
     Moda House.
-    """
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [user_email],
-            fail_silently=False,
-        )
-    
-    if new_status == 'paid':  
-        subject = f"Order #{instance.id} Update"
-        message = f"""
+            """
+        elif current_status == 'paid':
+            message = f"""
     Hello {instance.user.username},
 
-    Thank you for Payment for order #{instance.id}.
+    Thank you for your payment for order #{instance.id}.
     Total: {instance.total_price} EGP
-    You will get an email once the order is shipped for you. 
+    You will get an email once the order is shipped. 
     Thank you for shopping with us.
     Moda House.
-    """
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [user_email],
-            fail_silently=False,
-        )
-    
-    if new_status == 'shipped':  
-        subject = f"Order #{instance.id} Update"
-        message = f"""
+            """
+        elif current_status == 'shipped':
+            message = f"""
     Hello {instance.user.username},
 
-    Your Order #{instance.id} Has been shipped and it's on his way to you.
-    for any problems please contact us at +20123456789.
+    Your Order #{instance.id} has been shipped and it's on its way to you.
+    For any problems please contact us at +20123456789.
 
     Thank you for shopping with us.
     Moda House.
-    """
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [user_email],
-            fail_silently=False,
-        )
-    
-    if new_status == 'delivered':  
-        subject = f"Order #{instance.id} Update"
-        message = f"""
+            """
+        elif current_status == 'delivered':
+            message = f"""
     Hello {instance.user.username},
 
-    Your Order #{instance.id} Has been Delivered safely.
+    Your Order #{instance.id} has been delivered safely.
 
-    for any problems please contact us at +20123456789.
-    we look forward to seeing you again!
+    For any problems please contact us at +20123456789.
+    We look forward to seeing you again!
 
     Thank you for shopping with us.
     Moda House.
-    """
+            """
+        
+        if message:
+            send_order_email(subject, message, user_email)
 
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [user_email],
-            fail_silently=False,
-        )
-
-
-
-@receiver(pre_save, sender=Order)
-def email_admin_order_status(sender, instance, **kwargs):
-
-    if not instance.pk:
-        return
-
-    try:
-        old_order = Order.objects.get(pk=instance.pk)
-    except Order.DoesNotExist:
-        return
-
-    old_status = old_order.status
-    new_status = instance.status
-
-    if old_status != new_status:
-
+    # Admin Notification Logic
+    if not created and current_status != original_status:
         subject = f"Order #{instance.id} Status Updated"
-
         message = f"""
 Order ID: {instance.id}
 Customer: {instance.user.username}
-Old Status: {old_status}
-New Status: {new_status}
+Old Status: {original_status}
+New Status: {current_status}
 Total: {instance.total_price} EGP
         """
-
         admin_email = settings.DEFAULT_FROM_EMAIL
-
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [admin_email],
-            fail_silently=False,
-        )
+        send_order_email(subject, message, admin_email)
+    
+    # Update _original_status for subsequent saves on the same instance
+    instance._original_status = current_status
