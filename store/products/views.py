@@ -24,6 +24,10 @@ class ProductListAPIView(ListAPIView):
         if category:
             queryset = queryset.filter(category_id=category)
 
+        brand = self.request.GET.get('brand')
+        if brand:
+            queryset = queryset.filter(brand_id=brand)
+
         return queryset
 
     
