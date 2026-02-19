@@ -24,10 +24,23 @@ class PayOrderView(APIView):
             order = Order.objects.get(id=order_id, user=request.user)
         except Order.DoesNotExist:
             return Response({"error": "Order not found"}, status=404)
+      
+        if order.status == "cod":
+            return Response({"message": "This is a Cash on Delivery order. No online payment required."}, status=200)
 
         if order.status != "pending":
             return Response({"error": "Order already processed"}, status=400)
 
+        # Check stock first
+        with transaction.atomic():
+            order = Order.objects.select_for_update().get(id=order.id)
+            for item in order.items.select_related("product").select_for_update():
+                if item.product.stock < item.quantity:
+                    return Response(
+                        {"error": f"Not enough stock for {item.product.name} only {item.product.stock} left"},
+                        status=409
+                )
+        
         # Get Auth Token
         auth_response = requests.post(
             "https://accept.paymob.com/api/auth/tokens",
@@ -39,15 +52,6 @@ class PayOrderView(APIView):
         if not token:
             return Response({"error": "Paymob auth failed"}, status=500)
 
-        # Check stock first
-        with transaction.atomic():
-            order = Order.objects.select_for_update().get(id=order.id)
-            for item in order.items.select_related("product").select_for_update():
-                if item.product.stock < item.quantity:
-                    return Response(
-                        {"error": f"Not enough stock for {item.product.name} only {item.product.stock} left"},
-                        status=409
-                )
         
         # Create Paymob Order
         order_response = requests.post(

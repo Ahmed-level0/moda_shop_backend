@@ -74,6 +74,17 @@ def order_status_changed(sender, instance, created, **kwargs):
     Thank you for shopping with us.
     Moda House.
             """
+        elif current_status == 'cod':
+            message = f"""
+    Hello {instance.user.username},
+
+    Thank you for you order #{instance.id}.
+    Total: {instance.total_price} EGP Cash on Delivery.
+    You will get an email once the order is shipped. 
+    Kindly Reminder that even if you didn't accept the order after delivery you will pay delivery fees.
+    Thank you for shopping with us.
+    Moda House.
+            """
         elif current_status == 'shipped':
             message = f"""
     Hello {instance.user.username},

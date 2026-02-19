@@ -75,6 +75,7 @@ class CartViewSet(viewsets.ViewSet):
 
         phone = request.data.get('phone')
         address = request.data.get('address')
+        payment_method = request.data.get('payment_method', 'online')
 
         if not phone or not address:
             return Response({"error": "Phone and address required"}, status=400)
@@ -85,7 +86,7 @@ class CartViewSet(viewsets.ViewSet):
             total_price=cart.total_price,
             phone=phone,
             address=address,
-            status='pending'
+            status='pending' if payment_method == 'online' else 'cod'
         )
 
         # Creating and order item for each item in the cart
@@ -96,12 +97,32 @@ class CartViewSet(viewsets.ViewSet):
                 quantity=item.quantity if item.quantity <= item.product.stock else item.product.stock, # for safety
                 price=item.product.price
             )
+
+        # If COD, deduct stock immediately
+        if order.status == 'cod':
+            from django.db import transaction
+            from django.db.models import F
+            with transaction.atomic():
+                for item in order.items.all():
+                    # Double check stock before final deduction
+                    if item.product.stock < item.quantity:
+                        return Response(
+                            {"error": f"Not enough stock for {item.product.name} only {item.product.stock} left"},
+                            status=409
+                    )
+                    item.product.stock = F('stock') - item.quantity
+                    item.product.save()
+
         cart.is_active = False
         cart.save()
         
         # Create a new active cart for the user
         Cart.objects.create(user=request.user)
+        
+        message = "Order created. Payment required." if order.status == 'pending' else "Order placed successfully (Cash on Delivery)."
+        
         return Response({
             "order_id": order.id,
-            "message": "Order created. Payment required."
+            "message": message,
+            "status": order.status
         }, status=201)
