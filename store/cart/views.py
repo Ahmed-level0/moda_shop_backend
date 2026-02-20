@@ -7,6 +7,7 @@ from .serializers import CartSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from orders.models import Order, OrderItem
+from coupons.models import Coupon
 
 class CartViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
@@ -65,7 +66,33 @@ class CartViewSet(viewsets.ViewSet):
             item.save()
         return Response(CartSerializer(cart).data, status=200)
 
- 
+    @action(detail=False, methods=['post'])
+    def apply_coupon(self, request):
+        code = request.data.get('code')
+        if not code:
+            return Response({"error": "Coupon code is required"}, status=400)
+        
+        try:
+            coupon = Coupon.objects.get(code=code)
+        except Coupon.DoesNotExist:
+            return Response({"error": "Invalid coupon code"}, status=404)
+        
+        if not coupon.is_valid:
+            return Response({"error": "Coupon is expired or invalid"}, status=400)
+        
+        cart = self.get_active_cart(request.user)
+        cart.coupon = coupon
+        cart.save()
+        
+        return Response(CartSerializer(cart).data, status=200)
+
+    @action(detail=False, methods=['post'])
+    def remove_coupon(self, request):
+        cart = self.get_active_cart(request.user)
+        cart.coupon = None
+        cart.save()
+        return Response(CartSerializer(cart).data, status=200)
+
     @action(detail=False, methods=['post'])
     def checkout(self, request):
         cart = self.get_active_cart(request.user)
@@ -80,10 +107,21 @@ class CartViewSet(viewsets.ViewSet):
         if not phone or not address:
             return Response({"error": "Phone and address required"}, status=400)
 
+        # Calculate discount amount for storage
+        discount_amount = 0
+        if cart.coupon and cart.coupon.is_valid:
+            items_total = sum(item.total_price for item in cart.items.all())
+            if cart.coupon.discount_type == 'percentage':
+                discount_amount = items_total * cart.coupon.discount / 100
+            else:
+                discount_amount = min(cart.coupon.discount, items_total)
+
         # Creating an order for the user
         order = Order.objects.create(
             user=request.user,
             total_price=cart.total_price,
+            coupon=cart.coupon,
+            discount_amount=discount_amount,
             phone=phone,
             address=address,
             status='pending' if payment_method == 'online' else 'cod'
@@ -112,6 +150,10 @@ class CartViewSet(viewsets.ViewSet):
                     )
                     item.product.stock = F('stock') - item.quantity
                     item.product.save()
+
+        if cart.coupon:
+            cart.coupon.usage_count = models.F('usage_count') + 1
+            cart.coupon.save()
 
         cart.is_active = False
         cart.save()

@@ -64,12 +64,21 @@ class UpdateOrderView(APIView):
                 }, status=200)
 
             # Recalculate total
-            total_price = sum(
+            items_total = sum(
                 item.price * item.quantity
                 for item in order.items.all()
             )
 
-            order.total_price = total_price
+            # Recalculate discount if coupon exists
+            if order.coupon:
+                if order.coupon.discount_type == 'percentage':
+                    order.discount_amount = items_total * order.coupon.discount / 100
+                else:
+                    order.discount_amount = min(order.coupon.discount, items_total)
+            else:
+                order.discount_amount = 0
+
+            order.total_price = items_total - order.discount_amount
 
         order.save()
 

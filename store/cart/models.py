@@ -7,11 +7,17 @@ class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='carts')
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True) # Indicates if the cart is active or has been checked out
+    coupon = models.ForeignKey('coupons.Coupon', on_delete=models.SET_NULL, null=True, blank=True)
 
     @property
     def total_price(self):
-        total = sum(item.total_price for item in self.items.all())
-        return total
+        items_total = sum(item.total_price for item in self.items.all())
+        if self.coupon and self.coupon.is_valid:
+            if self.coupon.discount_type == 'percentage':
+                return items_total * (100 - self.coupon.discount) / 100
+            else:
+                return max(items_total - self.coupon.discount, 0)
+        return items_total
     
     def __str__(self):
         return f"Cart {self.id} - {self.user.username}"

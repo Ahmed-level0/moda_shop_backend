@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'accounts',
     'corsheaders',
     'payments',
+    'coupons.apps.CouponsConfig',
 ]
 SITE_ID = 1
 
