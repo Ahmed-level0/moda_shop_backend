@@ -72,12 +72,13 @@ class UpdateOrderView(APIView):
                 except OrderItem.DoesNotExist:
                     continue
 
-            # If no items left → delete order
+            # If no items left → CANCEL order
             if not order.items.exists():
-                order.delete()
+                order.status = 'cancelled'
+                order.save()
 
                 return Response({
-                    "message": "Order deleted because it has no items"
+                    "message": "Order cancelled because it has no items"
                 }, status=200)
 
             # Recalculate total
