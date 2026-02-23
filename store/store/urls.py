@@ -26,10 +26,10 @@ urlpatterns = [
     path('api/', include('cart.urls')),
     path('api/auth/', include('dj_rest_auth.urls')),
     path("api/auth/register/", include("dj_rest_auth.registration.urls")),
-    path('', include('accounts.urls')),
+    path('api/', include('accounts.urls')),
     path("accounts/", include("allauth.urls")), 
     path("api/payments/", include("payments.urls")),
-    path("orders/", include("orders.urls")),
+    path("api/orders/", include("orders.urls")),
 ]
 
 if settings.DEBUG:
