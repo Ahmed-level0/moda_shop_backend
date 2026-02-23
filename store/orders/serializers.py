@@ -3,14 +3,13 @@ from coupons.serializers import CouponSerializer
 from .models import Order, OrderItem
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    product_name = serializers.ReadOnlyField(source='product.name')
-    product_price = serializers.ReadOnlyField(source='product.final_price')
+    product_price = serializers.ReadOnlyField(source='price')
     total_price = serializers.SerializerMethodField()
     product_image = serializers.SerializerMethodField()
     
     class Meta:
         model = OrderItem
-        fields = ['id', 'product', 'product_name', 'product_price', 'quantity', 'total_price', 'product_image']
+        fields = ['id', 'product', 'product_price', 'quantity', 'total_price', 'product_image']
 
     def get_product_image(self, obj):
         image = obj.product.images.first()
@@ -19,7 +18,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         return None
 
     def get_total_price(self, obj):
-        return obj.total_price
+        return obj.price * obj.quantity
 
 
 
