@@ -19,7 +19,9 @@ class MeView(APIView):
                 "id": o.id,
                 "status": o.status,
                 "total": o.total_price,
-                "created": o.created_at
+                "created": o.created_at,
+                "address": o.address,
+                "phonenumber": o.phone
             }
             for o in orders
         ]
