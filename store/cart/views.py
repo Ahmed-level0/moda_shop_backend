@@ -161,7 +161,7 @@ class CartViewSet(viewsets.ViewSet):
         # Create a new active cart for the user
         Cart.objects.create(user=request.user)
         
-        message = "Order created. Payment required." if order.status == 'pending' else "Order placed successfully (Cash on Delivery)."
+        message = "Order created. Payment required." if order.status == 'pending' else "Order placed successfully"
         
         return Response({
             "order_id": order.id,
