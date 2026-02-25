@@ -1,3 +1,5 @@
+from django.db import transaction
+from django.db.models import F
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -138,8 +140,6 @@ class CartViewSet(viewsets.ViewSet):
 
         # If COD, deduct stock immediately
         if order.status == 'cod':
-            from django.db import transaction
-            from django.db.models import F
             with transaction.atomic():
                 for item in order.items.all():
                     # Double check stock before final deduction
@@ -152,7 +152,7 @@ class CartViewSet(viewsets.ViewSet):
                     item.product.save()
 
         if cart.coupon:
-            cart.coupon.usage_count = models.F('usage_count') + 1
+            cart.coupon.usage_count = F('usage_count') + 1
             cart.coupon.save()
 
         cart.is_active = False
