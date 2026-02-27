@@ -19,3 +19,11 @@ class UserSerializer(ModelSerializer):
         user.save()
         Token.objects.create(user=user)
         return user
+
+
+# Serializer for contact form
+class ContactSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=255)
+    email = serializers.EmailField()
+    subject = serializers.CharField(max_length=255)
+    message = serializers.CharField()
