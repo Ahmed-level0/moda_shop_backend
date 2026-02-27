@@ -75,7 +75,7 @@ class CartViewSet(viewsets.ViewSet):
             return Response({"error": "Coupon code is required"}, status=400)
         
         try:
-            coupon = Coupon.objects.get(code=code)
+            coupon = Coupon.objects.get(code__iexact=code)
         except Coupon.DoesNotExist:
             return Response({"error": "Invalid coupon code"}, status=404)
         
@@ -83,6 +83,14 @@ class CartViewSet(viewsets.ViewSet):
             return Response({"error": "Coupon is expired or invalid"}, status=400)
         
         cart = self.get_active_cart(request.user)
+        
+        if cart.coupon:
+            return Response({"error": "Cart already has a coupon applied"}, status=400)
+
+        if coupon.discount_type == "fixed":
+            if coupon.discount >= cart.total_price:
+                return Response({"error":"Can't add this coupon to this cart"}, status=400) 
+        
         cart.coupon = coupon
         cart.save()
         
