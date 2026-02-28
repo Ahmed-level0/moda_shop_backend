@@ -21,6 +21,10 @@ class Product(models.Model):
     discount = models.PositiveIntegerField(default= 0) # Allows only positive values
     stock = models.PositiveIntegerField(default= 0)
     description = models.TextField(blank= True)
+    style = models.CharField(max_length= 20, blank= True, null= True)
+    color = models.CharField(max_length= 20, blank= True, null= True)
+    size = models.CharField(max_length= 20, blank= True, null= True)
+    material = models.CharField(max_length= 20, blank= True, null= True)
 
     # Calculate the final price after applying discount
     @property

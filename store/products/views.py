@@ -20,6 +20,18 @@ class ProductListAPIView(ListAPIView):
         if self.request.GET.get('in_stock') == 'true':
             queryset = queryset.filter(stock__gt=0)
 
+        if self.request.GET.get('style'):
+            queryset = queryset.filter(style=self.request.GET.get('style'))
+
+        if self.request.GET.get('color'):
+            queryset = queryset.filter(color=self.request.GET.get('color'))
+
+        if self.request.GET.get('size'):
+            queryset = queryset.filter(size=self.request.GET.get('size'))
+
+        if self.request.GET.get('material'):
+            queryset = queryset.filter(material=self.request.GET.get('material'))
+
         category = self.request.GET.get('category')
         if category:
             queryset = queryset.filter(category_id=category)
