@@ -38,7 +38,7 @@ class UpdateOrderView(APIView):
 
         order = get_object_or_404(Order, id=order_id, user=request.user)
 
-        if order.status != 'pending':
+        if order.status != 'pending' and not order.status == 'cod':
             return Response({"error": "Only pending orders can be updated"}, status=400)
 
         if phone:
